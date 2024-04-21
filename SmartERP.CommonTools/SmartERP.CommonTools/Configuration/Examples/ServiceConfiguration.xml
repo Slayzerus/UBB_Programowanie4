@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+	<ActiveDirectoryUrl>10.3.1.13</ActiveDirectoryUrl>
+	<ActiveDirectoryUserSearchBase>OU=Users,OU=_Production,DC=PCPL,DC=pg,DC=local</ActiveDirectoryUserSearchBase>
+	<ActiveDirectoryAccessSearchBase>OU=_new_Security,OU=Groups,OU=_Production,DC=PCPL,DC=pg,DC=local</ActiveDirectoryAccessSearchBase>
+	<ActiveDirectoryAccessGroupName>PCPL_IS_PROFI_USER</ActiveDirectoryAccessGroupName>
+	<ActiveDirectoryUserPrefix>PCPL\</ActiveDirectoryUserPrefix>
+	<AccessTokenValidityTimeInMinutes>60</AccessTokenValidityTimeInMinutes>
+	<RefreshTokenValidityTimeInMinutes>90</RefreshTokenValidityTimeInMinutes>
+</Settings>

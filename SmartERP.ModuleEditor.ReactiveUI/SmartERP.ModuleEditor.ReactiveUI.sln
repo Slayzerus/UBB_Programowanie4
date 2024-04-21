@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.ModuleEditor.ReactiveUI", "SmartERP.ModuleEditor.ReactiveUI\SmartERP.ModuleEditor.ReactiveUI.csproj", "{B13C8C70-A781-47D0-90A9-B38F3A2FBD46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.ModuleEditor.ReactiveUI.Desktop", "SmartERP.ModuleEditor.ReactiveUI.Desktop\SmartERP.ModuleEditor.ReactiveUI.Desktop.csproj", "{35F2242C-F2D2-40E0-9931-0B9FFA9F3386}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B13C8C70-A781-47D0-90A9-B38F3A2FBD46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B13C8C70-A781-47D0-90A9-B38F3A2FBD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B13C8C70-A781-47D0-90A9-B38F3A2FBD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B13C8C70-A781-47D0-90A9-B38F3A2FBD46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35F2242C-F2D2-40E0-9931-0B9FFA9F3386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35F2242C-F2D2-40E0-9931-0B9FFA9F3386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35F2242C-F2D2-40E0-9931-0B9FFA9F3386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35F2242C-F2D2-40E0-9931-0B9FFA9F3386}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A76E8E9C-F842-4E2C-95AD-CC9299E8351F}
+	EndGlobalSection
+EndGlobal

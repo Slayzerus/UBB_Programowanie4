@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.Development.Domain", "SmartERP.Development.Domain\SmartERP.Development.Domain.csproj", "{140F5B8D-A464-469F-A1C2-3D7986B780C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.Development.Database", "SmartERP.Development.Database\SmartERP.Development.Database.csproj", "{68D8ED84-48D5-4E79-9C0D-D7B6BE20FC91}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.Development.Infrastructure", "SmartERP.Development.Infrastructure\SmartERP.Development.Infrastructure.csproj", "{ED50D3B6-BF16-4FA1-921D-675704C2790D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartERP.Development.Application.Avalonia", "SmartERP.Development.Application.Avalonia\SmartERP.Development.Application.Avalonia.csproj", "{FC2A7B4D-F41D-4994-BD02-5103F3882B56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{140F5B8D-A464-469F-A1C2-3D7986B780C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{140F5B8D-A464-469F-A1C2-3D7986B780C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{140F5B8D-A464-469F-A1C2-3D7986B780C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{140F5B8D-A464-469F-A1C2-3D7986B780C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68D8ED84-48D5-4E79-9C0D-D7B6BE20FC91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68D8ED84-48D5-4E79-9C0D-D7B6BE20FC91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68D8ED84-48D5-4E79-9C0D-D7B6BE20FC91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68D8ED84-48D5-4E79-9C0D-D7B6BE20FC91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED50D3B6-BF16-4FA1-921D-675704C2790D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED50D3B6-BF16-4FA1-921D-675704C2790D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED50D3B6-BF16-4FA1-921D-675704C2790D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED50D3B6-BF16-4FA1-921D-675704C2790D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC2A7B4D-F41D-4994-BD02-5103F3882B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2A7B4D-F41D-4994-BD02-5103F3882B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2A7B4D-F41D-4994-BD02-5103F3882B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2A7B4D-F41D-4994-BD02-5103F3882B56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4BA12ADF-E40F-402F-96F1-E1AE97EA8867}
+	EndGlobalSection
+EndGlobal

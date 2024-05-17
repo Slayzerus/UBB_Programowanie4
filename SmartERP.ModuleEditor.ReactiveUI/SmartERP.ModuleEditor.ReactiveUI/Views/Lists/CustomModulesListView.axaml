@@ -7,21 +7,32 @@
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Lists.CustomModulesListView"
              x:DataType="vm:Lists.CustomModulesListViewModel">
 
-  <TextBlock>Module list</TextBlock>
-  <!--  
-  <ListBox ItemsSource="{Binding Modules}">
-    <ListBox.ItemTemplate>
-      <DataTemplate DataType="models:CustomModuleModel">
-        <Grid ColumnDefinitions="Auto, *">
-          
-          <ContentControl Content="{Binding}" ContentTemplate="{x:Static dataTemplates:DataTemplateProvider.GenderDataTemplate}" />
-          <TextBlock Grid.Column="1"
-                     Margin="10,0"
-                     VerticalAlignment="Center"
-                     Text="{Binding}" />
-        </Grid>
-      </DataTemplate>
-    </ListBox.ItemTemplate>
-  </ListBox>
-  -->
+  <StackPanel>
+    <TextBlock>
+      Modules
+    </TextBlock>
+    <Button Command="{Binding AddModule_Click}">Add</Button>
+    <ItemsControl ItemsSource="{Binding Modules}" >
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Margin="0,10,0,0"
+              CornerRadius="5"
+              BorderBrush="Gray" BorderThickness="1"
+              Padding="5">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Name}"/>
+              <TextBlock Text="{Binding DisplayName}"/>
+              <TextBlock Text="{Binding DescriptionName}"/>
+              <Button 
+                Command="{Binding $parent[UserControl].DataContext.EditButton_Click}"
+                CommandParameter="{Binding Id}">
+                Edit
+              </Button>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+
 </UserControl>

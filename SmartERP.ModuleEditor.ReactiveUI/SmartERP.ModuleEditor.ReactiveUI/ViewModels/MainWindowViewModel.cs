@@ -4,6 +4,7 @@ using SmartERP.ModuleEditor.ReactiveUI.Enums;
 using SmartERP.ModuleEditor.ReactiveUI.ViewModels.Lists;
 using System.Collections.Generic;
 using System;
+using SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels
 {
@@ -16,7 +17,9 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels
 
         public Dictionary<PageType, Type> Pages { get; } = new()
         {
-            { PageType.ModuleList, typeof(CustomModulesListViewModel) }
+            { PageType.ModuleList, typeof(CustomModulesListViewModel) },
+            { PageType.ModuleForm, typeof(CustomModuleFormViewModel) },
+
         };
 
         private ViewModelBase _currentPage = new CustomModulesListViewModel();

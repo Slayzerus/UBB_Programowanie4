@@ -4,5 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomModuleFormView">
-  Welcome to Avalonia!
+
+  <StackPanel>
+    <Button Command="{Binding SaveButton_Click}">Save</Button>
+    <Button Command="{Binding GenerateButton_Click}">Generate</Button>
+    <Button Command="{Binding CloseButton_Click}">Close</Button>
+    <TextBox Text="{Binding Module.Name}"></TextBox>
+    <TextBox Text="{Binding Module.DisplayName}"></TextBox>
+    <TextBox Text="{Binding Module.Description}"></TextBox>
+    <TextBlock>Entities</TextBlock>
+    
+  </StackPanel>
+  
 </UserControl>

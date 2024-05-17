@@ -8,6 +8,8 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
     {
         private static MainWindow _mainWindow;
 
+        private static MainWindowViewModel _mainWindowViewModel;
+
         private static readonly object _lock = new object();
 
         public static MainWindow MainWindow
@@ -18,17 +20,35 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 {
                     lock (_lock)
                     {
-                        if (_mainWindow == null)
-                        {
-                            _mainWindow = new MainWindow
-                            {
-                                DataContext = new MainWindowViewModel()
-                            };
-                        }
+                        CreateMainWindow();
                     }
                 }
                 return _mainWindow;
             }
+        }
+
+        public static MainWindowViewModel MainWindowViewModel
+        {
+            get
+            {
+                if (_mainWindowViewModel == null)
+                {
+                    lock (_lock)
+                    {
+                        CreateMainWindow();
+                    }
+                }
+                return _mainWindowViewModel;
+            }
+        }
+
+        private static void CreateMainWindow()
+        {
+            _mainWindowViewModel = new MainWindowViewModel();
+            _mainWindow = new MainWindow
+            {
+                DataContext = _mainWindowViewModel
+            };
         }
     }
 }

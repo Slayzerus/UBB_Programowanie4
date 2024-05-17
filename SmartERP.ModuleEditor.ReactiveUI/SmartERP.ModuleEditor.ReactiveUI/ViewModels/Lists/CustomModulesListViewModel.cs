@@ -1,5 +1,9 @@
 ﻿using ReactiveUI;
+using SmartERP.Development.Application.Avalonia.Services.Interfaces;
 using SmartERP.Development.Application.Models;
+using SmartERP.Development.Domain.Entities;
+using SmartERP.ModuleEditor.ReactiveUI.Enums;
+using SmartERP.ModuleEditor.ReactiveUI.Static;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -7,11 +11,21 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Lists
 {
     public partial class CustomModulesListViewModel : ViewModelBase
     {
-        public CustomModulesListViewModel()
+        private IDevelopmentService _developmentService;
+
+        public CustomModulesListViewModel(long entityId = 0)
         {
+            _developmentService = DependencyResolver.Instance.Get<IDevelopmentService>();
+            Modules = new ObservableCollection<CustomModuleModel>(
+                _developmentService.GetAll<CustomModule, CustomModuleModel>().ToList());
+
+#if DEBUG
+            if (Modules.Count == 0)
+            {
+                Modules.Add(CustomModuleModel.Example);
+            }
+#endif
         }
-
-
 
         //public ICommand AddModuleClickCommand { get; }
 
@@ -24,7 +38,8 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Lists
         //[RelayCommand]
         public void AddModule_Click()
         {
-            OpenModuleForm(new CustomModuleModel());
+            AppWindows.MainWindowViewModel.Navigate(PageType.ModuleForm);
+            //OpenModuleForm(new CustomModuleModel());
             //IsAddModuleVisible = !IsAddModuleVisible;
         }
 
@@ -35,7 +50,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Lists
 
         //public ICommand EditModuleCommand { get; }
 
-        public void EditModule_Click(object idObj)
+        public void EditButton_Click(object idObj)
         {
             if (!(idObj is long))
             {
@@ -50,7 +65,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Lists
                 return;
             }
 
-            OpenModuleForm(model);
+            AppWindows.MainWindowViewModel.Navigate(PageType.ModuleForm, id);
         }
 
         private void OpenModuleForm(CustomModuleModel model)

@@ -1,4 +1,6 @@
-﻿using SmartERP.Development.Application.Models;
+﻿using NiceToDev.ProjectGenerator;
+using SmartERP.Development.Application.Models;
+using SmartERP.ModuleEditor.ReactiveUI.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +23,10 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
 
         public void GenerateModule(CustomModuleModel module)
         {
-            string moduleName = $"SmartERP.Module.{module.Name.Replace(" ", "").Replace(".", "")}";
+            CustomModuleConfig config = new();
+            config.RootPath = _moduleRootPath;
+
+           /* string moduleName = $"SmartERP.Module.{module.Name.Replace(" ", "").Replace(".", "")}";
             string modulePath = $"{_moduleRootPath}{moduleName}";
             string libProjectPath = $"{modulePath}\\{moduleName}";
 
@@ -34,9 +39,64 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
             }
             GenerateProject($"{moduleName}.API", $"{libProjectPath}.API", "webapi");
             Directory.CreateDirectory($"{modulePath}\\{moduleName}.VueJS");
-            CreateSolution(moduleName, modulePath);
+            CreateSolution(moduleName, modulePath);*/
 
             // Generate module
+        }
+
+        private SolutionInfo GenerateLibrarySolution(CustomModuleConfig module)
+        {
+            var solution = new SolutionInfo(module.Name, module.LibraryPath);
+            var databaseProject = GenerateLibraryDatabaseProject(module);
+            var domainProject = GenerateLibraryDomainProject(module);
+            var infrastructureProject = GenerateLibraryInfrastructureProject(module);
+            var applicationProject = GenerateLibraryApplicationProject(module);
+
+            databaseProject.References.Add(domainProject);
+            infrastructureProject.References.Add(databaseProject);
+            infrastructureProject.References.Add(domainProject);
+            applicationProject.References.Add(domainProject);
+            applicationProject.References.Add(infrastructureProject);
+
+            solution.Projects.Add(domainProject);
+            solution.Projects.Add(databaseProject);
+            solution.Projects.Add(infrastructureProject);
+            solution.Projects.Add(applicationProject);
+            return solution;
+        }
+
+        private SolutionInfo GenerateAPISolution(CustomModuleModel module, string moduleNameFull)
+        {
+            var solution = new SolutionInfo($"{module.Name}.API", $"{_moduleRootPath}{moduleNameFull}.API");
+            return solution;
+        }
+
+        private ProjectInfo GenerateLibraryDatabaseProject(CustomModuleConfig module)
+        {
+            var project = new ProjectInfo($"{module.ModuleFullName}.Database", $"{module.LibraryPath}\\{module.ModuleFullName}.Database");
+
+            return project;
+        }
+        
+        private ProjectInfo GenerateLibraryDomainProject(CustomModuleConfig module)
+        {
+            var project = new ProjectInfo($"{module.ModuleFullName}.Domain", $"{module.LibraryPath}\\{module.ModuleFullName}.Domain");
+
+            return project;
+        }
+        
+        private ProjectInfo GenerateLibraryInfrastructureProject(CustomModuleConfig module)
+        {
+            var project = new ProjectInfo($"{module.ModuleFullName}.Infrastructure", $"{module.LibraryPath}\\{module.ModuleFullName}.Infrastructure");
+
+            return project;
+        }
+
+        private ProjectInfo GenerateLibraryApplicationProject(CustomModuleConfig module)
+        {
+            var project = new ProjectInfo($"{module.ModuleFullName}.Application", $"{module.LibraryPath}\\{module.ModuleFullName}.Application");
+
+            return project;
         }
 
         private void CreateSolution(string moduleName, string modulePath)

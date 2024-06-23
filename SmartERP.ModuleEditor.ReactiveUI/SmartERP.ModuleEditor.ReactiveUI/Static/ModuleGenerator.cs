@@ -1,14 +1,12 @@
 ﻿using NiceToDev.ProjectGenerator;
 using SmartERP.Development.Application.Models;
 using SmartERP.ModuleEditor.ReactiveUI.Models;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.Static
 {
@@ -26,6 +24,10 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
             CustomModuleConfig config = new();
             config.RootPath = _moduleRootPath;
 
+            SolutionInfo solution = GenerateDotnetSolution(config);
+
+            GeneratorService generator = new();
+            string log = generator.Generate(solution);
             /* string moduleName = $"SmartERP.Module.{module.Name.Replace(" ", "").Replace(".", "")}";
              string modulePath = $"{_moduleRootPath}{moduleName}";
              string libProjectPath = $"{modulePath}\\{moduleName}";
@@ -44,7 +46,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
             // Generate module
         }
 
-        private SolutionInfo GenerateLibrarySolution(CustomModuleConfig module)
+        private SolutionInfo GenerateDotnetSolution(CustomModuleConfig module)
         {
             var solution = new SolutionInfo(module.Name, module.LibraryPath);
             var databaseProject = GenerateLibraryDatabaseProject(module);
@@ -106,6 +108,9 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
         {
             var project = new ProjectInfo($"{module.ModuleFullName}.Domain", $"{module.LibraryPath}\\{module.ModuleFullName}.Domain");
 
+            project.NuGets.Add(module.NuGetCommonToolsName);
+
+            //Entities
             foreach (CustomEntityModel entity in module.Entities)
             {
                 ClassInfo entityClass = new()
@@ -114,14 +119,27 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                     NamespaceBase = module.DomainEntitiesNamespace,
                     NamespaceWithoutBase = module.DomainEntitiesNamespace.Replace($"{module.DomainNamespace}.", "")
                 };
-                
-                foreach(CustomEntityFieldModel field in entity.Fields)
+
+                foreach (CustomEntityFieldModel field in entity.Fields)
                 {
                     entityClass.Properties.Add(field.Name, field.Type);
                 }
 
                 project.Classes.Add(entityClass);
             }
+
+            //IRepository
+            ClassInfo irepositoryClass = new()
+            {
+                Name = module.InfrastructureIRepositoryName,
+                NamespaceBase = module.DomainNamespace,
+                NamespaceWithoutBase = module.InfrastructureIRepositoryNamespace.Replace($"{module.DomainNamespace}.", ""),
+                Usings = { module.NuGetCommonToolsName },
+                Inheritance = { module.GenericRepositoryName },
+                IsInterface = true
+            };
+
+            project.Classes.Add(irepositoryClass);
 
             return project;
         }
@@ -130,20 +148,22 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
         {
             var project = new ProjectInfo($"{module.ModuleFullName}.Infrastructure", $"{module.LibraryPath}\\{module.ModuleFullName}.Infrastructure");
 
-            project.NuGets.Add(module.NuGetCommonToolsName);
-
-            //IRepository -> Domain
-            ClassInfo repositoryClass = new()
+            NiceToDev.ProjectGenerator.ConstructorInfo constructor = new()
             {
-                Name = module.IRepositoryName,
-                NamespaceBase = module.InfrastructureNamespace,
-                NamespaceWithoutBase = module.InfrastructureRepositoriesNamespace.Replace($"{module.InfrastructureNamespace}.", ""),
-                Usings = { module.NuGetCommonToolsName },
-                Inheritance = { module.GenericRepositoryName },
-                IsInterface = true
+                Parameters = { { module.InfrastructureRepositoryName, module.InfrastructureIRepositoryName } }
             };
 
+            ClassInfo repositoryClass = new()
+            {
+                Name = module.InfrastructureRepositoryName,
+                NamespaceBase = module.InfrastructureNamespace,
+                NamespaceWithoutBase = module.InfrastructureRepositoriesNamespace.Replace($"{module.InfrastructureNamespace}.", ""),
+                Usings = { module.NuGetCommonToolsName, module.InfrastructureIRepositoryNamespace },
+                Inheritance = { module.InfrastructureIRepositoryName },
+                IsInterface = true,
+            };
 
+            project.Classes.Add(repositoryClass);
 
             return project;
         }
@@ -151,6 +171,39 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
         private ProjectInfo GenerateLibraryApplicationProject(CustomModuleConfig module)
         {
             var project = new ProjectInfo($"{module.ModuleFullName}.Application", $"{module.LibraryPath}\\{module.ModuleFullName}.Application");
+
+            ClassInfo iserviceClass = new()
+            {
+                Name = module.ApplicationIServiceName,
+                NamespaceBase = module.ApplicationNamespace,
+                NamespaceWithoutBase = module.ApplicationInterfacesNamespace.Replace($"{module.ApplicationNamespace}.", ""),
+                Usings = { module.InfrastructureIRepositoryNamespace },
+                Inheritance = { module.GenericRepositoryName }
+            };
+
+            ClassInfo serviceClass = new()
+            {
+                Name = module.ApplicationServiceName,
+                NamespaceBase = module.ApplicationNamespace,
+                NamespaceWithoutBase = module.ApplicationServicesNamespace.Replace($"{module.ApplicationNamespace}.", ""),
+                Usings = {
+                    module.InfrastructureIRepositoryNamespace,
+                    module.GenericServiceNamespace,
+                    module.ApplicationInterfacesNamespace
+                },
+                Constructors ={
+                    new NiceToDev.ProjectGenerator.ConstructorInfo()
+                    {
+                         Parameters = { { module.InfrastructureRepositoryName, module.InfrastructureIRepositoryName } },
+                         BaseCalls = new(){ module.InfrastructureRepositoryName }
+                    }
+                },
+                Inheritance = { module.GenericServiceName }
+
+            };
+
+            project.Classes.Add(iserviceClass);
+            project.Classes.Add(serviceClass);
 
             return project;
         }

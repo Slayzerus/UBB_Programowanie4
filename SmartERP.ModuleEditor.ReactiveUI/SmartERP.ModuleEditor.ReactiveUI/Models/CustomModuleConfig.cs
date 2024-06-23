@@ -24,20 +24,50 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Models
 
         public string DatabaseNamespace => $"{ModuleFullName}.Database";
 
+        #region Infrastructure
+
         public string InfrastructureNamespace => $"{ModuleFullName}.Infrastructure";
 
         public string InfrastructureRepositoriesNamespace => $"{InfrastructureNamespace}.Repositories";
+
+        public string InfrastructureRepositoryName => $"{Name}Repository";
+
+        public string InfrastructureIRepositoryName => $"I{InfrastructureRepositoryName}";
+
+        public string InfrastructureIRepositoryNamespace => $"{DomainNamespace}.Repositories";
+
+        #endregion Infrastructure
+
+        #region Application
+
         public string ApplicationNamespace => $"{ModuleFullName}.Application";
 
         public string ApplicationServicesNamespace => $"{ApplicationNamespace}.Services";
+        public string ApplicationInterfacesNamespace => $"{ApplicationNamespace}.Interfaces";
+
+        public string ApplicationServiceName => $"{Name}Service";
+
+        public string ApplicationIServiceName => $"I{ApplicationServiceName}";
+
+        #endregion Application
+
+        #region CommonTools
 
         public string NuGetCommonToolsName => "SmartERP.CommonTools";
 
-        public string GenericRepositoryName => "IBaseRepository";
+        public string GenericRepositoryName => "BaseRepository";
 
-        public string RepositoryName => $"{Name}Repository";
+        public string GenericIRepositoryName => $"I{GenericRepositoryName}";
 
-        public string IRepositoryName => $"I{RepositoryName}";
+        public string GenericRepositoryNamespace => "SmartERP.CommonTools.Repositories";
+
+        public string GenericServiceName => "BaseService";
+
+        public string GenericIServiceName => $"I{GenericServiceName}";
+
+        public string GenericServiceNamespace => "SmartERP.CommonTools.Services";
+
+        #endregion CommonTools
 
         public Dictionary<CustomEntityModel, string> DbSetNames { get; set; } = new();
     }

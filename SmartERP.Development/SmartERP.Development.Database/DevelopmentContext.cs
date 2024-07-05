@@ -14,9 +14,18 @@ namespace SmartERP.Development.Database
 
         public DbSet<CustomView> Views { get; set; }
 
-        public DevelopmentContext(DbContextOptions<DevelopmentContext> options) : base(options)
+        public DevelopmentContext()
         {
             
+        }
+
+        public DevelopmentContext(DbContextOptions<DevelopmentContext> options) : base(options)
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Data Source=AERO16;Initial Catalog=SmartERP;Integrated Security=True;TrustServerCertificate=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

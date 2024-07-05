@@ -27,7 +27,9 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                         if (_instance == null)
                         {
                             IServiceProvider serviceProvider = DependencyInjection
-                                .BuildServiceProvider("Data Source=localhost;Initial Catalog=SmartERP;Integrated Security=True;TrustServerCertificate=True");
+                                //.BuildServiceProvider("Data Source=AERO16;Initial Catalog=SmartERP;Integrated Security=True;Trust Server Certificate=True");
+                                //.BuildServiceProvider("Server=localhost\\SQLEXPRESS;Database=SmartERP;Integrated Security=True;Trusted_Connection=True;");
+                                .BuildServiceProvider("Data Source=AERO16; Database=SmartERP; Integrated Security=true;TrustServerCertificate=True");
                             _instance = new DependencyResolver(serviceProvider);
                         }
                     }

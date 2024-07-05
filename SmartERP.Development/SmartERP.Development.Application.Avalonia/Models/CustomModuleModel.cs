@@ -49,13 +49,25 @@
                 model.Name = "Example";
                 model.DisplayName = "Example module";
                 CustomEntityModel entity = new CustomEntityModel() { Id = 1, Name = "ToDoList", DisplayName = "ToDo List" };
+
+                entity.Fields.Add(new CustomEntityFieldModel()
+                {
+                    Entity = entity,
+                    EntityId = entity.Id,
+                    Name = "Name",
+                    DisplayName = "Name",
+                    Type = "string"
+                });
+
                 entity.Fields.Add(new CustomEntityFieldModel()
                 {
                     Entity = entity,
                     EntityId = entity.Id,
                     Name = "IsComplete",
-                    DisplayName = "Completed"
+                    DisplayName = "Completed",
+                    Type = "bool"
                 });
+                
                 model.Entities.Add(entity);
 
                 return model;

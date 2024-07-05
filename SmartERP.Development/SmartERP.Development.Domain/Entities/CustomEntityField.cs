@@ -4,7 +4,7 @@
     {
         public long Id { get; set; }
 
-        public long SmartEntityId { get; set; }
+        public long EntityId { get; set; }
 
         public required CustomEntity Entity { get; set; }
 

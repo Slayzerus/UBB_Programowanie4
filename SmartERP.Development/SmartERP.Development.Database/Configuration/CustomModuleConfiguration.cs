@@ -8,7 +8,7 @@ namespace SmartERP.Development.Database.Configuration
     {
         public void Configure(EntityTypeBuilder<CustomModule> builder)
         {
-            builder.ToTable("Development", "CustomModules");
+            builder.ToTable("CustomModules", "development");
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Name);

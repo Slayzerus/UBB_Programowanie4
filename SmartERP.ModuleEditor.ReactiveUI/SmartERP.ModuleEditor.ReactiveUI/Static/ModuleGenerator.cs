@@ -1,4 +1,5 @@
-﻿using NiceToDev.ProjectGenerator;
+﻿using Mapster;
+using NiceToDev.ProjectGenerator;
 using SmartERP.Development.Application.Models;
 using SmartERP.ModuleEditor.ReactiveUI.Models;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
 
         public void GenerateModule(CustomModuleModel module)
         {
-            CustomModuleConfig config = new();
+            var config = module.Adapt<CustomModuleConfig>();
             config.RootPath = _moduleRootPath;
 
             SolutionInfo solution = GenerateDotnetSolution(config);

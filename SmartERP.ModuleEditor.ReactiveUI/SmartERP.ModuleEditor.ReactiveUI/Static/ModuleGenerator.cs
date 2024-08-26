@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Newtonsoft.Json;
 using NiceToDev.ProjectGenerator;
 using SmartERP.Development.Application.Models;
 using SmartERP.ModuleEditor.ReactiveUI.Models;
@@ -22,7 +23,16 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
 
         public void GenerateModule(CustomModuleModel module)
         {
-            var config = module.Adapt<CustomModuleConfig>();
+            CustomModuleConfig config = new()
+            {
+                Id = module.Id,
+                Name = module.Name,
+                DisplayName = module.DisplayName,
+                Description = module.Description,
+                Entities = module.Entities,
+                Views = module.Views,
+                IsValid = module.IsValid
+            };
             config.RootPath = _moduleRootPath;
 
             SolutionInfo solution = GenerateDotnetSolution(config);

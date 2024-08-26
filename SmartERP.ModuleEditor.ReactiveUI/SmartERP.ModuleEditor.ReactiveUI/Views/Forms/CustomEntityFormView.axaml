@@ -4,5 +4,50 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomEntityFormView">
-  Welcome to Avalonia!
+
+  <StackPanel Margin="10">
+    <TextBlock Text="Custom Entity Form" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
+
+    <TextBlock Text="Name:" />
+    <TextBox Text="{Binding Entity.Name}" />
+
+    <TextBlock Text="Display Name:" />
+    <TextBox Text="{Binding Entity.DisplayName}" />
+
+    <TextBlock Text="Description:" />
+    <TextBox Text="{Binding Entity.Description}" />
+
+    <TextBlock Text="Fields:" Margin="0,10,0,0" />
+
+    <ItemsControl ItemsSource="{Binding Fields}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="0,5,0,5">
+            <StackPanel>
+              <TextBlock Text="Field Name:" />
+              <TextBox Text="{Binding Name}" />
+
+              <TextBlock Text="Display Name:" />
+              <TextBox Text="{Binding DisplayName}" />
+
+              <TextBlock Text="Type:" />
+              <TextBox Text="{Binding Type}" />
+
+              <CheckBox Content="Is Required" IsChecked="{Binding IsRequired}" />
+
+              <Button Content="Remove Field" Command="{Binding DataContext.RemoveFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,5,0,0"/>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <Button Content="Add Field" Command="{Binding AddFieldCommand}" Margin="0,10,0,0"/>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+      <Button Content="Save" Command="{Binding SaveCommand}" Margin="5"/>
+      <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="5"/>
+    </StackPanel>
+  </StackPanel>
+
 </UserControl>

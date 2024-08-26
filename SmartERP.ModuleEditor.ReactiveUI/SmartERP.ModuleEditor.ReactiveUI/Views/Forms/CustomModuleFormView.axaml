@@ -6,12 +6,33 @@
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomModuleFormView">
 
   <StackPanel>
-    <Button Command="{Binding SaveButton_Click}">Save</Button>
-    <Button Command="{Binding GenerateButton_Click}">Generate</Button>
-    <Button Command="{Binding CloseButton_Click}">Close</Button>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <Button Grid.Column="0" Command="{Binding GenerateButton_Click}"
+              HorizontalAlignment="Left"
+              IsEnabled="{Binding CanGenerate}">
+        Generate
+      </Button>
+      
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Command="{Binding SaveButton_Click}">Save</Button>
+        <Button Command="{Binding CloseButton_Click}">Cancel</Button>
+      </StackPanel>
+    </Grid>
+
+    <TextBlock>Module Name</TextBlock>
     <TextBox Text="{Binding Module.Name}"></TextBox>
+    
+    <TextBlock>Display Name</TextBlock>
     <TextBox Text="{Binding Module.DisplayName}"></TextBox>
+    
+    <TextBlock>Description</TextBlock>
     <TextBox Text="{Binding Module.Description}"></TextBox>
+    
     <TextBlock>Entities</TextBlock>
     
   </StackPanel>

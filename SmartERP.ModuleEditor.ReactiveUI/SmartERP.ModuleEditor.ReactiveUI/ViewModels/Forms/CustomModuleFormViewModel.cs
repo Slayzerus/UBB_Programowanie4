@@ -1,4 +1,6 @@
-﻿using SmartERP.Development.Application.Avalonia.Services.Interfaces;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using SmartERP.Development.Application.Avalonia.Services.Interfaces;
 using SmartERP.Development.Application.Models;
 using SmartERP.Development.Domain.Entities;
 using SmartERP.ModuleEditor.ReactiveUI.Enums;
@@ -6,11 +8,21 @@ using SmartERP.ModuleEditor.ReactiveUI.Static;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
 {
-    public partial class CustomModuleFormViewModel : ViewModelBase
+    public partial class CustomModuleFormViewModel : ViewModelBase, INotifyPropertyChanged
     {
         private IDevelopmentService _developmentService;
 
         public CustomModuleModel Module { get; set; } = new CustomModuleModel();
+
+        // Implementacja INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null!)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool CanGenerate => Module.Id != 0;
 
         public CustomModuleFormViewModel(long entityId = 0)
         {
@@ -21,7 +33,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
                 if (module != null)
                 {
                     Module = module;
-                }                
+                }
             }
         }
 
@@ -29,12 +41,15 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
         {
             if (Module.Id == 0)
             {
-                _developmentService.Add<CustomModule, CustomModuleModel>(Module);
+                Module = _developmentService.Add<CustomModule, CustomModuleModel>(Module);
             }
             else
             {
                 _developmentService.Update<CustomModule, CustomModuleModel>(Module);
             }
+
+            // Powiadomienie o zmianie wartości CanGenerate
+            OnPropertyChanged(nameof(CanGenerate));
         }
 
         public void GenerateButton_Click()
@@ -47,37 +62,5 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
         {
             AppWindows.MainWindowViewModel.Navigate(PageType.ModuleList);
         }
-        /*private readonly CustomModuleFormWindow _form;
-
-        private readonly CustomModulesListViewModel _listViewModel;
-
-        private CustomModuleModel _module = new CustomModuleModel();
-
-        private string _nameValidationMessage = string.Empty;
-
-        public CustomModuleFormViewModel(CustomModulesListViewModel listViewModel, CustomModuleFormWindow form)
-        {
-            _listViewModel = listViewModel;
-            _form = form;
-        }
-
-        public void AddCustomEntity()
-        {
-            //Module.Entities.Add(new CustomEntityModel() { Module = Module });
-        }
-
-        public void RemoveCustomEntity(CustomEntityModel entity)
-        {
-            //Module.Entities.Remove(entity);
-        }
-
-        public void SaveModule()
-        {
-            if (Module.Id != 0)
-            {
-                _listViewModel.Modules.Add(Module);
-            }
-            _form.Close();
-        }*/
     }
 }

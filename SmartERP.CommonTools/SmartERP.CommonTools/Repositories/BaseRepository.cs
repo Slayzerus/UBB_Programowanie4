@@ -12,10 +12,11 @@ namespace SmartERP.CommonTools.Repositories
             _context = context;    
         }
 
-        public void Add<TEntity>(TEntity entity) where TEntity : class
+        public TEntity Add<TEntity>(TEntity entity) where TEntity : class
         {
             _context.Set<TEntity>().Add(entity);
             _context.SaveChanges();
+            return entity;
         }
 
         public void AddRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class

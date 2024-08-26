@@ -5,14 +5,18 @@ using SmartERP.Development.Application.Models;
 using SmartERP.Development.Domain.Entities;
 using SmartERP.ModuleEditor.ReactiveUI.Enums;
 using SmartERP.ModuleEditor.ReactiveUI.Static;
+using ReactiveUI;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
 {
     public partial class CustomModuleFormViewModel : ViewModelBase, INotifyPropertyChanged
     {
         private IDevelopmentService _developmentService;
+        private bool _isEntityFormVisible;
 
         public CustomModuleModel Module { get; set; } = new CustomModuleModel();
+
+        public CustomEntityModel SelectedEntity { get; set; } = new CustomEntityModel();
 
         // Implementacja INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -22,19 +26,33 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // Właściwość kontrolująca widoczność formularza
+        public bool IsEntityFormVisible
+        {
+            get => _isEntityFormVisible;
+            set
+            {
+                _isEntityFormVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool CanGenerate => Module.Id != 0;
 
-        public CustomModuleFormViewModel(long entityId = 0)
+        public CustomModuleFormViewModel(long moduleId = 0)
         {
             _developmentService = DependencyResolver.Instance.Get<IDevelopmentService>();
-            if (entityId != 0)
+            if (moduleId != 0)
             {
-                CustomModuleModel? module = _developmentService.Get<CustomModule, CustomModuleModel>(x => x.Id == entityId);
+                CustomModuleModel? module = _developmentService.Get<CustomModule, CustomModuleModel>(x => x.Id == moduleId);
                 if (module != null)
                 {
                     Module = module;
                 }
             }
+
+            // Ukryj formularz podczas uruchamiania
+            IsEntityFormVisible = false;
         }
 
         public void SaveButton_Click()
@@ -61,6 +79,36 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
         public void CloseButton_Click()
         {
             AppWindows.MainWindowViewModel.Navigate(PageType.ModuleList);
+        }
+
+        public void AddEntity_Click()
+        {
+            // Otwórz formularz dla nowego entity
+            SelectedEntity = new CustomEntityModel();
+            IsEntityFormVisible = true;
+        }
+
+        public void EditEntity_Click(CustomEntityModel entity)
+        {
+            // Otwórz formularz dla edytowanego entity
+            SelectedEntity = entity;
+            IsEntityFormVisible = true;
+        }
+
+        public void SaveEntity_Click()
+        {
+            // Zapisz entity do listy i ukryj formularz
+            if (!Module.Entities.Contains(SelectedEntity))
+            {
+                Module.Entities.Add(SelectedEntity);
+            }
+            IsEntityFormVisible = false;
+        }
+
+        public void CancelEntity_Click()
+        {
+            // Ukryj formularz bez zapisu
+            IsEntityFormVisible = false;
         }
     }
 }

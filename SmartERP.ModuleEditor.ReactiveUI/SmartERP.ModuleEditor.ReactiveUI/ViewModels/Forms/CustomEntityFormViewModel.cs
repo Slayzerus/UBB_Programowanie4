@@ -1,83 +1,94 @@
-﻿using ReactiveUI;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using SmartERP.Development.Application.Avalonia.Services.Interfaces;
 using SmartERP.Development.Application.Models;
 using SmartERP.Development.Domain.Entities;
 using SmartERP.ModuleEditor.ReactiveUI.Static;
-using System.Collections.ObjectModel;
-using System.Reactive;
+using SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
 {
-    public class CustomEntityFormViewModel : ViewModelBase
+    public class CustomEntityFormViewModel : INotifyPropertyChanged
     {
         private IDevelopmentService _developmentService;
+        private CustomEntityFieldModel? _selectedField = null;
+        private CustomEntityModel _selectedEntity = new();
 
-        private CustomEntityModel _entity;
-        public CustomEntityModel Entity
+        public CustomEntityModel SelectedEntity
         {
-            get => _entity;
-            set => this.RaiseAndSetIfChanged(ref _entity, value);
+            get => _selectedEntity;
+            set
+            {
+                _selectedEntity = value;
+                OnPropertyChanged();
+            }
         }
 
-        public ObservableCollection<CustomEntityFieldModel> Fields { get; } = new ObservableCollection<CustomEntityFieldModel>();
+        public CustomEntityFieldModel? SelectedField
+        {
+            get => _selectedField;
+            set
+            {
+                _selectedField = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public ReactiveCommand<Unit, Unit> AddFieldCommand { get; }
-        public ReactiveCommand<CustomEntityFieldModel, Unit> RemoveFieldCommand { get; }
-        public ReactiveCommand<Unit, Unit> SaveCommand { get; }
-        public ReactiveCommand<Unit, Unit> CancelCommand { get; }
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public CustomEntityFormViewModel(long entityId = 0)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null!)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public CustomEntityFormViewModel(long enityId = 0)
         {
             _developmentService = DependencyResolver.Instance.Get<IDevelopmentService>();
-
-            if (entityId != 0)
+            if (enityId != 0)
             {
-                Entity = _developmentService.GetById<CustomEntity, CustomEntityModel>(entityId) ?? new();
-                foreach (var field in Entity.Fields)
+                CustomEntityModel? entity = _developmentService.Get<CustomEntity, CustomEntityModel>(x => x.Id == enityId);
+                if (entity != null)
                 {
-                    Fields.Add(field);
+                    SelectedEntity = entity;
+                    if (entity.Fields.Count > 0)
+                    {
+                        SelectedField = entity.Fields[0];
+                    }
                 }
             }
-            else
-            {
-                Entity = new CustomEntityModel();
-            }
-
-            AddFieldCommand = ReactiveCommand.Create(AddField);
-            RemoveFieldCommand = ReactiveCommand.Create<CustomEntityFieldModel>(RemoveField);
-            SaveCommand = ReactiveCommand.Create(SaveEntity);
-            CancelCommand = ReactiveCommand.Create(Cancel);
         }
 
-        private void AddField()
+        // Dodawanie nowego pola
+        public void AddField_Click()
         {
-            var newField = new CustomEntityFieldModel { Entity = Entity, EntityId = Entity.Id };
-            Fields.Add(newField);
+            SelectedField = new CustomEntityFieldModel() { Entity = SelectedEntity };
+            SelectedEntity.Fields.Add(SelectedField);
         }
 
-        private void RemoveField(CustomEntityFieldModel field)
+        // Edytowanie istniejącego pola
+        public void EditField_Click(CustomEntityFieldModel field)
         {
-            if (Fields.Contains(field))
-            {
-                Fields.Remove(field);
-            }
+            SelectedField = field;
         }
 
-        private void SaveEntity()
+        // Usuwanie pola
+        public void DeleteField_Click(CustomEntityFieldModel field)
         {
-            if (Entity.Id == 0)
-            {
-                _developmentService.Add<CustomEntity, CustomEntityModel>(Entity);
-            }
-            else
-            {
-                _developmentService.Update<CustomEntity, CustomEntityModel>(Entity);
-            }
+            SelectedEntity.Fields.Remove(field);
         }
 
-        private void Cancel()
+        // Zapisanie encji (w tym także pól)
+        public void SaveEntity_Click()
         {
-            // Implementacja nawigacji lub inna logika zamknięcia formularza
+            // Logika zapisu encji
+        }
+
+        // Anulowanie edycji encji
+        public void CancelEntity_Click()
+        {
+            // Logika anulowania edycji
         }
     }
 }

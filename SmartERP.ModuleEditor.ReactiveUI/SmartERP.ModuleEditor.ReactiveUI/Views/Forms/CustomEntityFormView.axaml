@@ -2,52 +2,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomEntityFormView">
+             x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomEntityFormView"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450">
 
-  <StackPanel Margin="10">
-    <TextBlock Text="Custom Entity Form" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
+  <StackPanel>
+    <TextBlock>Entity Name</TextBlock>
+    <TextBox Text="{Binding SelectedEntity.Name}" Watermark="Enter entity name..."></TextBox>
 
-    <TextBlock Text="Name:" />
-    <TextBox Text="{Binding Entity.Name}" />
+    <TextBlock>Entity Description</TextBlock>
+    <TextBox Text="{Binding SelectedEntity.Description}" Watermark="Enter entity description..."></TextBox>
 
-    <TextBlock Text="Display Name:" />
-    <TextBox Text="{Binding Entity.DisplayName}" />
+    <!-- Sekcja zarządzania polami -->
+    <TextBlock Margin="0,10,0,0">Fields</TextBlock>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Content="Add Field" Command="{Binding AddField_Click}"/>
+    </StackPanel>
 
-    <TextBlock Text="Description:" />
-    <TextBox Text="{Binding Entity.Description}" />
-
-    <TextBlock Text="Fields:" Margin="0,10,0,0" />
-
-    <ItemsControl ItemsSource="{Binding Fields}">
-      <ItemsControl.ItemTemplate>
+    <ListBox ItemsSource="{Binding SelectedEntity.Fields}" SelectedItem="{Binding SelectedField}">
+      <ListBox.ItemTemplate>
         <DataTemplate>
-          <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="0,5,0,5">
-            <StackPanel>
-              <TextBlock Text="Field Name:" />
-              <TextBox Text="{Binding Name}" />
-
-              <TextBlock Text="Display Name:" />
-              <TextBox Text="{Binding DisplayName}" />
-
-              <TextBlock Text="Type:" />
-              <TextBox Text="{Binding Type}" />
-
-              <CheckBox Content="Is Required" IsChecked="{Binding IsRequired}" />
-
-              <Button Content="Remove Field" Command="{Binding DataContext.RemoveFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,5,0,0"/>
-            </StackPanel>
-          </Border>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Name}" Width="150"/>
+            <TextBlock Text="{Binding Type}" Width="100"/>
+            <CheckBox IsChecked="{Binding IsRequired}" Content="Required"/>
+            <Button Content="Edit" Command="{Binding DataContext.EditField_Click, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+            <Button Content="Delete" Command="{Binding DataContext.DeleteField_Click, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+          </StackPanel>
         </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
+      </ListBox.ItemTemplate>
+    </ListBox>
 
-    <Button Content="Add Field" Command="{Binding AddFieldCommand}" Margin="0,10,0,0"/>
-
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-      <Button Content="Save" Command="{Binding SaveCommand}" Margin="5"/>
-      <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="5"/>
+    <!-- Przyciski zapisu i anulowania -->
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+      <Button Command="{Binding SaveEntity_Click}">Save</Button>
+      <Button Command="{Binding CancelEntity_Click}">Cancel</Button>
     </StackPanel>
   </StackPanel>
-
 </UserControl>

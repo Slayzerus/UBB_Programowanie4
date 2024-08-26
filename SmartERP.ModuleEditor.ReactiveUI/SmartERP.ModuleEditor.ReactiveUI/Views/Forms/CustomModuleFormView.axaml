@@ -1,8 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:forms="clr-namespace:SmartERP.ModuleEditor.ReactiveUI.Views.Forms"
+             xmlns:lists="clr-namespace:SmartERP.ModuleEditor.ReactiveUI.Views.Lists"
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomModuleFormView">
 
   <StackPanel>
@@ -17,7 +16,7 @@
               IsEnabled="{Binding CanGenerate}">
         Generate
       </Button>
-      
+
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
         <Button Command="{Binding SaveButton_Click}">Save</Button>
         <Button Command="{Binding CloseButton_Click}">Cancel</Button>
@@ -25,16 +24,23 @@
     </Grid>
 
     <TextBlock>Module Name</TextBlock>
-    <TextBox Text="{Binding Module.Name}"></TextBox>
-    
+    <TextBox Text="{Binding Module.Name}" Watermark="Enter module name..."></TextBox>
+
     <TextBlock>Display Name</TextBlock>
-    <TextBox Text="{Binding Module.DisplayName}"></TextBox>
-    
+    <TextBox Text="{Binding Module.DisplayName}" Watermark="Enter display name..."></TextBox>
+
     <TextBlock>Description</TextBlock>
-    <TextBox Text="{Binding Module.Description}"></TextBox>
-    
+    <TextBox Text="{Binding Module.Description}" Watermark="Enter description..."></TextBox>
+
     <TextBlock>Entities</TextBlock>
-    
+
+    <!-- CustomEntityFormView - initially hidden -->
+    <forms:CustomEntityFormView IsVisible="{Binding IsEntityFormVisible}"
+                                DataContext="{Binding SelectedEntityViewModel}" />
+
+    <!-- CustomEntitiesListView -->
+    <lists:CustomEntitiesListView />
+
   </StackPanel>
-  
+
 </UserControl>

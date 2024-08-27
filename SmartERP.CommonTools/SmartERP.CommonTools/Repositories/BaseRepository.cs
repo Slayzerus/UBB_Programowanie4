@@ -19,14 +19,41 @@ namespace SmartERP.CommonTools.Repositories
             return entity;
         }
 
-        public void AddRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+        public IEnumerable<TEntity> AddRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
             _context.Set<TEntity>().AddRange(entities);
             _context.SaveChanges();
+            return entities;
         }
 
         public void Update<TEntity>(TEntity entity) where TEntity : class
         {
+            var keyName = _context.Model.FindEntityType(typeof(TEntity))?
+                             .FindPrimaryKey()?
+                             .Properties
+                             .Select(x => x.Name)
+                             .Single();
+
+            if (keyName == null)
+            {
+                throw new InvalidOperationException($"Entity {typeof(TEntity).Name} does not have a single primary key property.");
+            }
+            var keyProperty = typeof(TEntity).GetProperty(keyName);
+            if (keyProperty == null)
+            {
+                throw new InvalidOperationException($"Entity {typeof(TEntity).Name} does not have a key property.");
+            }
+
+            var keyValue = keyProperty.GetValue(entity);
+
+            var existingEntity = _context.Set<TEntity>().Local
+                .FirstOrDefault(e => keyProperty.GetValue(e).Equals(keyValue));
+
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).State = EntityState.Detached;
+            }
+
             _context.Entry(entity).State = EntityState.Modified;
             _context.SaveChanges();
         }

@@ -19,7 +19,7 @@ namespace SmartERP.CommonTools.Services
             where TModel : class
         {            
             TEntity entity = model.Adapt<TEntity>();
-            _repository.Add(entity);
+            entity = _repository.Add(entity);
             return entity.Adapt<TModel>();
         }
 

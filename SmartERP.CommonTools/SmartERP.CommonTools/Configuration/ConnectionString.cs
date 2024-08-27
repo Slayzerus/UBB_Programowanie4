@@ -27,32 +27,9 @@ namespace SmartERP.CommonTools.Configuration
             _configuration = configuration;
             _connectionStringName = connectionStringName;
             ReadEnvironmentVariables();
-            if (!IsValid)
-            {
-
-            }
         }
 
         public DatabaseType DbType => dbType;
-
-        public bool IsValid
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(db);
-            }
-        }
-
-        public string Generate()
-        {
-            if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(db) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass))
-            {
-                return GenerateFromParameters();
-            }
-
-            dbType = DatabaseType.SQLServer;
-            return _configuration.GetConnectionString(_connectionStringName) ?? string.Empty;
-        }
 
         private void ReadEnvironmentVariables()
         {
@@ -90,12 +67,6 @@ namespace SmartERP.CommonTools.Configuration
             }
         }
 
-        private void ReadConfigFile()
-        {
-            IEnumerable<string> list = new List<string>();
-            List<string> test = list.Where(x => x.StartsWith('w')).ToList();
-        }
-
         private bool ReadSqlServerVariables()
         {
             db = Environment.GetEnvironmentVariable("DBNAME");
@@ -131,6 +102,17 @@ namespace SmartERP.CommonTools.Configuration
             return string.Empty;
         }
 
-        
+        public string Get()
+        {
+            ReadEnvironmentVariables();
+
+            if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(db) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass))
+            {
+                return GenerateFromParameters();
+            }
+
+            dbType = DatabaseType.SQLServer;
+            return _configuration.GetConnectionString(_connectionStringName) ?? string.Empty;
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace SmartERP.CommonTools.Services
         public BaseService(IBaseRepository repository)
         {
             _repository = repository;
+            TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
         }
 
         public TModel Add<TEntity, TModel>(TModel model)

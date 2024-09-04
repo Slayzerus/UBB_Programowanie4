@@ -169,7 +169,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 Name = module.InfrastructureRepositoryName,
                 NamespaceBase = module.InfrastructureNamespace,
                 NamespaceWithoutBase = module.InfrastructureRepositoriesNamespace.Replace($"{module.InfrastructureNamespace}.", ""),
-                Usings = { $"{module.NuGetCommonToolsName}.Repositories", module.InfrastructureIRepositoryNamespace },
+                Usings = { $"{module.NuGetCommonToolsName}.Repositories", module.InfrastructureIRepositoryNamespace, module.DatabaseContextsNamespace },
                 Inheritance = { module.GenericRepositoryName, module.InfrastructureIRepositoryName },
                 Constructors = 
                 { 

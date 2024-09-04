@@ -5,12 +5,13 @@ namespace NiceToDev.ProjectGenerator
 {
     public class GeneratorService
     {
-        private readonly CmdClient _cmdClient = new(true,false);
+        private readonly CmdClient _cmdClient = new(true, false);
 
         public string Generate(SolutionInfo solution)
         {
             ClearPath(solution.Path);
             StringBuilder stringBuilder = new();
+            CreateDirectoryIfNotExists(solution.Path);
             foreach (ProjectInfo project in solution.Projects)
             {
                 stringBuilder.AppendLine(Generate(project));
@@ -22,7 +23,7 @@ namespace NiceToDev.ProjectGenerator
         public string Generate(ProjectInfo project)
         {
             StringBuilder result = new();
-            _cmdClient.AddCommand($"cd {project.Path}");
+            _cmdClient.AddCommand($"cd {GetParentPath(project.Path)}");
             _cmdClient.AddCommand($"dotnet new {project.Template} -n {project.Name}");
             result.AppendLine(_cmdClient.Execute());
 
@@ -97,7 +98,7 @@ namespace NiceToDev.ProjectGenerator
 
             content.AppendLine("\t}");
             content.AppendLine("}");
-            
+
             string directoryPath = $"{rootPath}\\{classInfo.NamespaceWithoutBase.Replace(".", "\\")}";
             CreateDirectoryIfNotExists(classInfo.NamespaceWithoutBase.Replace(".", "\\"), rootPath);
             string filePath = $"{directoryPath}\\{classInfo.Name}.cs";
@@ -141,6 +142,11 @@ namespace NiceToDev.ProjectGenerator
             }
 
             return _cmdClient.Execute();
+        }
+
+        private string GetParentPath(string path)
+        {            
+            return Path.GetFullPath(Path.Combine(path, @".."));
         }
     }
 }

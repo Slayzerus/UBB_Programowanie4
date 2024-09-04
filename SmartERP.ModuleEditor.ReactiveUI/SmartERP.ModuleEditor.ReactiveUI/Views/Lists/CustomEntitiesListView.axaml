@@ -9,8 +9,8 @@
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
       <Button Content="Add Entity" Command="{Binding AddEntity_Click}"/>
     </StackPanel>
-
-    <ListBox ItemsSource="{Binding Module.Entities}" SelectedItem="{Binding SelectedEntity}">
+    <TextBlock>Entities:</TextBlock>
+    <ListBox ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity}">
       <ListBox.ItemTemplate>
         <DataTemplate>
           <StackPanel Orientation="Horizontal">

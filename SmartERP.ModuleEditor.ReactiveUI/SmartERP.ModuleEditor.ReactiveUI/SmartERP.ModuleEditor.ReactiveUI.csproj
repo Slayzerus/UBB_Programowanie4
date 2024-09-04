@@ -23,11 +23,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NiceToDev.CommandLine" Version="1.0.5" />
-    <PackageReference Include="NiceToDev.ProjectGenerator" Version="1.0.2" />
-    <PackageReference Include="SmartERP.CommonTools" Version="1.0.6" />
-    <PackageReference Include="SmartERP.Development.Application.Avalonia" Version="1.0.12" />
+    <PackageReference Include="NiceToDev.ProjectGenerator" Version="1.0.5" />
+    <PackageReference Include="SmartERP.CommonTools" Version="1.0.7" />
+    <PackageReference Include="SmartERP.Development.Application.Avalonia" Version="1.0.16" />
     <PackageReference Include="SmartERP.Development.Database" Version="1.0.7" />
     <PackageReference Include="SmartERP.Development.Domain" Version="1.0.3" />
-    <PackageReference Include="SmartERP.Development.Infrastructure" Version="1.0.6" />
+    <PackageReference Include="SmartERP.Development.Infrastructure" Version="1.0.8" />
   </ItemGroup>
 </Project>

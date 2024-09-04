@@ -24,6 +24,10 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Models
 
         public string DatabaseNamespace => $"{ModuleFullName}.Database";
 
+        public string DatabaseContextsNamespace => $"{DatabaseNamespace}.Contexts";
+
+        public string DatabaseContextName => $"{Name}Context";
+
         #region Infrastructure
 
         public string InfrastructureNamespace => $"{ModuleFullName}.Infrastructure";

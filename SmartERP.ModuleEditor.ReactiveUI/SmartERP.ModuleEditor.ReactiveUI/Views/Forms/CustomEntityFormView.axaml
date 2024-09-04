@@ -6,36 +6,35 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450">
 
   <StackPanel>
+    <TextBlock Text="{Binding EntityFormTitle}"></TextBlock>
     <TextBlock>Entity Name</TextBlock>
-    <TextBox Text="{Binding SelectedEntity.Name}" Watermark="Enter entity name..."></TextBox>
+    <TextBox Text="{Binding SelectedEntity.Name, Mode=TwoWay}" Watermark="Enter entity name..."></TextBox>
 
     <TextBlock>Entity Description</TextBlock>
-    <TextBox Text="{Binding SelectedEntity.Description}" Watermark="Enter entity description..."></TextBox>
+    <TextBox Text="{Binding SelectedEntity.Description, Mode=TwoWay}" Watermark="Enter entity description..."></TextBox>
 
-    <!-- Sekcja zarządzania polami -->
     <TextBlock Margin="0,10,0,0">Fields</TextBlock>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Content="Add Field" Command="{Binding AddField_Click}"/>
+      <Button Content="Add Field" Command="{Binding AddFieldCommand}" />
     </StackPanel>
-
-    <ListBox ItemsSource="{Binding SelectedEntity.Fields}" SelectedItem="{Binding SelectedField}">
+    
+    <ListBox ItemsSource="{Binding Fields}" SelectedItem="{Binding SelectedField}">
       <ListBox.ItemTemplate>
         <DataTemplate>
           <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Name}" Width="150"/>
-            <TextBlock Text="{Binding Type}" Width="100"/>
+            <TextBox Text="{Binding Name}" Width="150"/>
+            <TextBox Text="{Binding Type}" Width="100"/>
             <CheckBox IsChecked="{Binding IsRequired}" Content="Required"/>
-            <Button Content="Edit" Command="{Binding DataContext.EditField_Click, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
-            <Button Content="Delete" Command="{Binding DataContext.DeleteField_Click, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+            <Button Content="Edit" Command="{Binding EditFieldCommand}" />
+            <Button Content="Delete" Command="{Binding DeleteFieldCommand}"/>
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
 
-    <!-- Przyciski zapisu i anulowania -->
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-      <Button Command="{Binding SaveEntity_Click}">Save</Button>
-      <Button Command="{Binding CancelEntity_Click}">Cancel</Button>
+      <Button Content="Save" Command="{Binding SaveEntityCommand}" />
+      <Button Content="Cancel" Command="{Binding CancelEntityCommand}" />
     </StackPanel>
   </StackPanel>
 </UserControl>

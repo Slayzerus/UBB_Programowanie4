@@ -4,18 +4,31 @@
              xmlns:lists="clr-namespace:SmartERP.ModuleEditor.ReactiveUI.Views.Lists"
              x:Class="SmartERP.ModuleEditor.ReactiveUI.Views.Forms.CustomModuleFormView">
 
-  <StackPanel>
-    <Grid>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <!-- Wiersz dla przycisków -->
+      <RowDefinition Height="Auto"/>
+      <!-- Wiersz dla pól formularza -->
+      <RowDefinition Height="*"/>
+      <!-- Wiersz dla dolnej części (kolumny) -->
+    </Grid.RowDefinitions>
+
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="3*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Górna część - pasek przycisków, bez podziału na kolumny -->
+    <Grid Grid.Row="0" Grid.ColumnSpan="2">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
 
-      <Button Grid.Column="0" Command="{Binding GenerateButton_Click}"
-              HorizontalAlignment="Left"
-              IsEnabled="{Binding CanGenerate}">
-        Generate
-      </Button>
+      <StackPanel Grid.Column="0" HorizontalAlignment="Left">
+        <Button Command="{Binding GenerateButton_Click}" IsEnabled="{Binding CanGenerate}">Generate</Button>
+      </StackPanel>
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
         <Button Command="{Binding SaveButton_Click}">Save</Button>
@@ -23,24 +36,26 @@
       </StackPanel>
     </Grid>
 
-    <TextBlock>Module Name</TextBlock>
-    <TextBox Text="{Binding Module.Name}" Watermark="Enter module name..."></TextBox>
+    <!-- Pola formularza - osobny wiersz -->
+    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="10">
+      <TextBlock>Module Name</TextBlock>
+      <TextBox Text="{Binding Module.Name}" Watermark="Enter module name..."></TextBox>
 
-    <TextBlock>Display Name</TextBlock>
-    <TextBox Text="{Binding Module.DisplayName}" Watermark="Enter display name..."></TextBox>
+      <TextBlock>Display Name</TextBlock>
+      <TextBox Text="{Binding Module.DisplayName}" Watermark="Enter display name..."></TextBox>
 
-    <TextBlock>Description</TextBlock>
-    <TextBox Text="{Binding Module.Description}" Watermark="Enter description..."></TextBox>
+      <TextBlock>Description</TextBlock>
+      <TextBox Text="{Binding Module.Description}" Watermark="Enter description..."></TextBox>
+    </StackPanel>
 
-    <TextBlock>Entities</TextBlock>
-
-    <!-- CustomEntityFormView - initially hidden -->
-    <forms:CustomEntityFormView IsVisible="{Binding IsEntityFormVisible}"
-                                DataContext="{Binding SelectedEntityViewModel}" />
-
-    <!-- CustomEntitiesListView -->
-    <lists:CustomEntitiesListView />
-
-  </StackPanel>
-
+    <!-- Lewa kolumna - CustomEntityFormView -->
+    <StackPanel Grid.Row="2" Grid.Column="0" Margin="10">
+      <lists:CustomEntitiesListView/>      
+    </StackPanel>
+    
+    <!-- Prawa kolumna - CustomEntitiesListView -->
+    <StackPanel Grid.Row="2" Grid.Column="1" Margin="10">
+      <forms:CustomEntityFormView IsVisible="{Binding IsVisible}" DataContext="{Binding SelectedEntityViewModel}" />
+    </StackPanel>
+  </Grid>
 </UserControl>

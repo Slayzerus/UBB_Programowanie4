@@ -1,59 +1,55 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using SmartERP.Development.Application.Avalonia.Services.Interfaces;
+﻿using SmartERP.Development.Application.Avalonia.Services.Interfaces;
 using SmartERP.Development.Application.Models;
 using SmartERP.Development.Domain.Entities;
 using SmartERP.ModuleEditor.ReactiveUI.Enums;
 using SmartERP.ModuleEditor.ReactiveUI.Static;
 using ReactiveUI;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
 {
-    public partial class CustomModuleFormViewModel : ViewModelBase, INotifyPropertyChanged
+    public partial class CustomModuleFormViewModel : ViewModelBase
     {
+        #region Fields
+
         private IDevelopmentService _developmentService;
         private bool _isEntityFormVisible;
+
+        #endregion Fields
+
+        #region Properties
 
         public CustomModuleModel Module { get; set; } = new CustomModuleModel();
 
         public CustomEntityModel SelectedEntity { get; set; } = new CustomEntityModel();
 
-        // Implementacja INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public CustomEntityFormViewModel SelectedEntityViewModel { get; set; }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null!)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // Właściwość kontrolująca widoczność formularza
-        public bool IsEntityFormVisible
-        {
-            get => _isEntityFormVisible;
-            set
-            {
-                _isEntityFormVisible = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<CustomEntityModel> Entities { get; set; } = new();
 
         public bool CanGenerate => Module.Id != 0;
 
+        #endregion Properties
+
         public CustomModuleFormViewModel(long moduleId = 0)
         {
+            SelectedEntityViewModel = new CustomEntityFormViewModel(this);
+
             _developmentService = DependencyResolver.Instance.Get<IDevelopmentService>();
             if (moduleId != 0)
             {
-                CustomModuleModel? module = _developmentService.Get<CustomModule, CustomModuleModel>(x => x.Id == moduleId);
+                CustomModuleModel? module = _developmentService.GetCustomModuleById(moduleId);
+
                 if (module != null)
                 {
                     Module = module;
+                    Entities = new ObservableCollection<CustomEntityModel>(Module.Entities);
                 }
             }
-
-            // Ukryj formularz podczas uruchamiania
-            IsEntityFormVisible = false;
         }
+
+        #region Events
 
         public void SaveButton_Click()
         {
@@ -66,14 +62,32 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
                 _developmentService.Update<CustomModule, CustomModuleModel>(Module);
             }
 
-            // Powiadomienie o zmianie wartości CanGenerate
-            OnPropertyChanged(nameof(CanGenerate));
+            foreach (CustomEntityModel entity in Entities)
+            {
+                entity.ModuleId = Module.Id;
+
+                /*foreach (CustomEntityFieldModel field in entity.Fields)
+                {
+                    field.Entity = null;
+                }*/
+
+                if (entity.Id == 0)
+                {
+                    entity.Id = _developmentService.Add<CustomEntity, CustomEntityModel>(entity).Id;
+                }
+                else
+                {
+                    _developmentService.Update<CustomEntity, CustomEntityModel>(entity);
+                }
+            }
+
+            this.RaisePropertyChanged(nameof(CanGenerate));
         }
 
         public void GenerateButton_Click()
         {
             ModuleGenerator moduleGenerator = new ModuleGenerator();
-            moduleGenerator.GenerateModule(CustomModuleModel.Example);
+            moduleGenerator.GenerateModule(Module);
         }
 
         public void CloseButton_Click()
@@ -83,32 +97,32 @@ namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
 
         public void AddEntity_Click()
         {
-            // Otwórz formularz dla nowego entity
             SelectedEntity = new CustomEntityModel();
-            IsEntityFormVisible = true;
+            SelectedEntityViewModel.SelectedEntity = SelectedEntity;
+            SelectedEntityViewModel.IsVisible = true;
         }
 
         public void EditEntity_Click(CustomEntityModel entity)
         {
-            // Otwórz formularz dla edytowanego entity
             SelectedEntity = entity;
-            IsEntityFormVisible = true;
+            SelectedEntityViewModel.SelectedEntity = SelectedEntity;
+            SelectedEntityViewModel.IsVisible = true;
         }
 
         public void SaveEntity_Click()
         {
-            // Zapisz entity do listy i ukryj formularz
             if (!Module.Entities.Contains(SelectedEntity))
             {
-                Module.Entities.Add(SelectedEntity);
+                Entities.Add(SelectedEntity);
             }
-            IsEntityFormVisible = false;
+            SelectedEntity = new CustomEntityModel();
         }
 
         public void CancelEntity_Click()
         {
-            // Ukryj formularz bez zapisu
-            IsEntityFormVisible = false;
+            SelectedEntity = new CustomEntityModel();
         }
+
+        #endregion Events
     }
 }

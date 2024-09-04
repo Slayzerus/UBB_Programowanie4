@@ -24,7 +24,7 @@ namespace NiceToDev.ProjectGenerator
         {
             StringBuilder result = new();
             _cmdClient.AddCommand($"cd {GetParentPath(project.Path)}");
-            _cmdClient.AddCommand($"dotnet new {project.Template} -n {project.Name}");
+            _cmdClient.AddCommand($"dotnet new {project.Template.ToString().ToLower()} -n {project.Name}");
             result.AppendLine(_cmdClient.Execute());
 
             foreach (ClassInfo classInfo in project.Classes)

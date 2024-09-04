@@ -1,94 +1,121 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using SmartERP.Development.Application.Avalonia.Services.Interfaces;
+﻿using ReactiveUI;
 using SmartERP.Development.Application.Models;
-using SmartERP.Development.Domain.Entities;
-using SmartERP.ModuleEditor.ReactiveUI.Static;
+using SmartERP.ModuleEditor.ReactiveUI.ViewModels;
 using SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive;
 
-namespace SmartERP.ModuleEditor.ReactiveUI.ViewModels.Forms
+public class CustomEntityFormViewModel : ViewModelBase
 {
-    public class CustomEntityFormViewModel : INotifyPropertyChanged
+    #region Fields
+
+    private CustomEntityModel _selectedEntity = new();
+    private CustomEntityFieldModel? _selectedField;
+    private string _entityFormTitle;
+    private CustomModuleFormViewModel _parentForm;
+    private bool _isVisible;
+
+    #endregion Fields
+
+    public CustomEntityFormViewModel(CustomModuleFormViewModel parentForm)
     {
-        private IDevelopmentService _developmentService;
-        private CustomEntityFieldModel? _selectedField = null;
-        private CustomEntityModel _selectedEntity = new();
+        AddFieldCommand = ReactiveCommand.Create(AddField_Click);
+        EditFieldCommand = ReactiveCommand.Create<CustomEntityFieldModel>(EditField_Click);
+        DeleteFieldCommand = ReactiveCommand.Create<CustomEntityFieldModel>(DeleteField_Click);
+        SaveEntityCommand = ReactiveCommand.Create(SaveEntity_Click, this.WhenAnyValue(x => x.CanSaveEntity));
+        CancelEntityCommand = ReactiveCommand.Create(CancelEntity_Click);
+        
+        _selectedEntity = new CustomEntityModel();
+        _entityFormTitle = "New entity";
+        _parentForm = parentForm;
+    }
 
-        public CustomEntityModel SelectedEntity
+    #region Properties
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => this.RaiseAndSetIfChanged(ref _isVisible, value);
+    }
+
+    public string EntityFormTitle
+    {
+        get => _entityFormTitle;
+        set => this.RaiseAndSetIfChanged(ref _entityFormTitle, value);
+    }
+
+    public CustomEntityModel SelectedEntity
+    {
+        get => _selectedEntity;
+        set
         {
-            get => _selectedEntity;
-            set
-            {
-                _selectedEntity = value;
-                OnPropertyChanged();
-            }
+            Fields = new ObservableCollection<CustomEntityFieldModel>(value.Fields);
+            this.RaiseAndSetIfChanged(ref _selectedEntity, value);
+            this.RaisePropertyChanged(nameof(CanSaveEntity)); // Powiadomienie o zmianie
         }
+    }
 
-        public CustomEntityFieldModel? SelectedField
-        {
-            get => _selectedField;
-            set
-            {
-                _selectedField = value;
-                OnPropertyChanged();
-            }
-        }
+    public CustomEntityFieldModel? SelectedField
+    {
+        get => _selectedField;
+        set => this.RaiseAndSetIfChanged(ref _selectedField, value);
+    }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+    public ObservableCollection<CustomEntityFieldModel> Fields { get; set; } = new();
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null!)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    public bool CanSaveEntity => true;
 
-        public CustomEntityFormViewModel(long enityId = 0)
-        {
-            _developmentService = DependencyResolver.Instance.Get<IDevelopmentService>();
-            if (enityId != 0)
-            {
-                CustomEntityModel? entity = _developmentService.Get<CustomEntity, CustomEntityModel>(x => x.Id == enityId);
-                if (entity != null)
-                {
-                    SelectedEntity = entity;
-                    if (entity.Fields.Count > 0)
-                    {
-                        SelectedField = entity.Fields[0];
-                    }
-                }
-            }
-        }
+    #endregion Properties
 
-        // Dodawanie nowego pola
-        public void AddField_Click()
-        {
-            SelectedField = new CustomEntityFieldModel() { Entity = SelectedEntity };
-            SelectedEntity.Fields.Add(SelectedField);
-        }
+    #region Commands
 
-        // Edytowanie istniejącego pola
-        public void EditField_Click(CustomEntityFieldModel field)
-        {
-            SelectedField = field;
-        }
+    public ReactiveCommand<Unit, Unit> AddFieldCommand { get; }
+    public ReactiveCommand<CustomEntityFieldModel, Unit> EditFieldCommand { get; }
+    public ReactiveCommand<CustomEntityFieldModel, Unit> DeleteFieldCommand { get; }
+    public ReactiveCommand<Unit, Unit> SaveEntityCommand { get; }
+    public ReactiveCommand<Unit, Unit> CancelEntityCommand { get; }
 
-        // Usuwanie pola
-        public void DeleteField_Click(CustomEntityFieldModel field)
-        {
-            SelectedEntity.Fields.Remove(field);
-        }
+    #endregion Commands
 
-        // Zapisanie encji (w tym także pól)
-        public void SaveEntity_Click()
-        {
-            // Logika zapisu encji
-        }
+    #region Events
 
-        // Anulowanie edycji encji
-        public void CancelEntity_Click()
-        {
-            // Logika anulowania edycji
-        }
+    private void AddField_Click()
+    {
+        var newField = new CustomEntityFieldModel { Entity = SelectedEntity };
+        Fields.Add(newField);
+        this.RaisePropertyChanged(nameof(Fields));
+    }
+
+    private void EditField_Click(CustomEntityFieldModel field)
+    {
+        SelectedField = field;
+    }
+
+    private void DeleteField_Click(CustomEntityFieldModel field)
+    {
+        SelectedEntity.Fields.Remove(field);
+        this.RaisePropertyChanged(nameof(CanSaveEntity));
+    }
+
+    private void SaveEntity_Click()
+    {
+        SelectedEntity.Fields = Fields.ToList();
+        _parentForm.SelectedEntity = SelectedEntity;
+        _parentForm.SaveEntity_Click();
+        IsVisible = false;
+    }
+
+    private void CancelEntity_Click()
+    {
+        IsVisible = false;
+        _parentForm.CancelEntity_Click();
+    }
+
+    #endregion Events
+
+    private void Clear()
+    {
+        _parentForm.SelectedEntity = new();
     }
 }

@@ -59,7 +59,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
 
         private SolutionInfo GenerateDotnetSolution(CustomModuleConfig module)
         {
-            var solution = new SolutionInfo(module.Name, module.LibraryPath);
+            var solution = new SolutionInfo(module.ModuleFullName, module.LibraryPath);
             var databaseProject = GenerateLibraryDatabaseProject(module);
             var domainProject = GenerateLibraryDomainProject(module);
             var infrastructureProject = GenerateLibraryInfrastructureProject(module);
@@ -96,22 +96,22 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                     ? $"{entity.Name.Substring(entity.Name.Length - 1)}ies"
                     : $"{entity.Name}";
 
-                properties.Add($"DbSet<{entity.Name}>", $"{dbSetName}");
+                properties.Add($"{dbSetName}", $"DbSet<{entity.Name}>");
                 module.DbSetNames.Add(entity, dbSetName);
             }
 
             ClassInfo contextClass = new()
             {
-                Name = $"{module.Name}Context",
-                NamespaceWithoutBase = "",
+                Name = module.DatabaseContextName,
+                NamespaceWithoutBase = module.DatabaseContextsNamespace.Replace($"{module.DatabaseNamespace}.", ""),
                 NamespaceBase = module.DatabaseNamespace,
                 Inheritance = { "DbContext" },
-                Usings = { module.DomainEntitiesNamespace },
+                Usings = { module.DomainEntitiesNamespace, "Microsoft.EntityFrameworkCore" },
                 Properties = properties
             };
 
             project.NuGets.Add("Microsoft.EntityFrameworkCore");
-
+            project.Classes.Add(contextClass);
             return project;
         }
 
@@ -127,7 +127,7 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 ClassInfo entityClass = new()
                 {
                     Name = entity.Name,
-                    NamespaceBase = module.DomainEntitiesNamespace,
+                    NamespaceBase = module.DomainNamespace,
                     NamespaceWithoutBase = module.DomainEntitiesNamespace.Replace($"{module.DomainNamespace}.", "")
                 };
 
@@ -145,8 +145,8 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 Name = module.InfrastructureIRepositoryName,
                 NamespaceBase = module.DomainNamespace,
                 NamespaceWithoutBase = module.InfrastructureIRepositoryNamespace.Replace($"{module.DomainNamespace}.", ""),
-                Usings = { module.NuGetCommonToolsName },
-                Inheritance = { module.GenericRepositoryName },
+                Usings = { $"{module.NuGetCommonToolsName}.Repositories" },
+                Inheritance = { $"I{module.GenericRepositoryName}" },
                 IsInterface = true
             };
 
@@ -159,19 +159,27 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
         {
             var project = new ProjectInfo($"{module.ModuleFullName}.Infrastructure", $"{module.LibraryPath}\\{module.ModuleFullName}.Infrastructure");
 
-            NiceToDev.ProjectGenerator.ConstructorInfo constructor = new()
+/*            NiceToDev.ProjectGenerator.ConstructorInfo constructor = new()
             {
                 Parameters = { { module.InfrastructureRepositoryName, module.InfrastructureIRepositoryName } }
             };
-
+*/
             ClassInfo repositoryClass = new()
             {
                 Name = module.InfrastructureRepositoryName,
                 NamespaceBase = module.InfrastructureNamespace,
                 NamespaceWithoutBase = module.InfrastructureRepositoriesNamespace.Replace($"{module.InfrastructureNamespace}.", ""),
-                Usings = { module.NuGetCommonToolsName, module.InfrastructureIRepositoryNamespace },
-                Inheritance = { module.InfrastructureIRepositoryName },
-                IsInterface = true,
+                Usings = { $"{module.NuGetCommonToolsName}.Repositories", module.InfrastructureIRepositoryNamespace },
+                Inheritance = { module.GenericRepositoryName, module.InfrastructureIRepositoryName },
+                Constructors = 
+                { 
+                    new NiceToDev.ProjectGenerator.ConstructorInfo() 
+                    {  
+                        BaseCalls = new() { FirstCharToLower(module.DatabaseContextName) },
+                        Parameters = new() { { FirstCharToLower(module.DatabaseContextName), module.DatabaseContextName } }                        
+                    } 
+                }
+
             };
 
             project.Classes.Add(repositoryClass);
@@ -188,8 +196,9 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 Name = module.ApplicationIServiceName,
                 NamespaceBase = module.ApplicationNamespace,
                 NamespaceWithoutBase = module.ApplicationInterfacesNamespace.Replace($"{module.ApplicationNamespace}.", ""),
-                Usings = { module.InfrastructureIRepositoryNamespace },
-                Inheritance = { module.GenericRepositoryName }
+                Usings = { $"{module.NuGetCommonToolsName}.Services" },
+                Inheritance = { $"{module.GenericIServiceName}" },
+                IsInterface = true
             };
 
             ClassInfo serviceClass = new()
@@ -205,8 +214,8 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
                 Constructors ={
                     new NiceToDev.ProjectGenerator.ConstructorInfo()
                     {
-                         Parameters = { { module.InfrastructureRepositoryName, module.InfrastructureIRepositoryName } },
-                         BaseCalls = new(){ module.InfrastructureRepositoryName }
+                         Parameters = { { FirstCharToLower(module.InfrastructureRepositoryName), module.InfrastructureIRepositoryName } },
+                         BaseCalls = new(){ FirstCharToLower(module.InfrastructureRepositoryName) }
                     }
                 },
                 Inheritance = { module.GenericServiceName }
@@ -219,86 +228,96 @@ namespace SmartERP.ModuleEditor.ReactiveUI.Static
             return project;
         }
 
-        private void CreateSolution(string moduleName, string modulePath)
+        public static string FirstCharToLower(string input)
         {
-            string cdCommand = $"cd {_moduleRootPath}";
-            string cdAgainCommand = $"cd {modulePath}";
-            string command = $"dotnet new sln -n {moduleName} -o {moduleName}";
-            string addLibProjectCommand = $"dotnet sln add {modulePath}\\{moduleName}\\{moduleName}.csproj";
-            string addApiProjectCommand = $"dotnet sln add {modulePath}\\{moduleName}.API\\{moduleName}.API.csproj";
-            Process.Start("cmd.exe", $"/c {cdCommand}&{command}&{cdAgainCommand}&{addLibProjectCommand}&{addApiProjectCommand}");
-        }
-
-        private void GenerateProject(string moduleName, string modulePath, string template)
-        {
-            if (Directory.Exists(modulePath))
+            if (string.IsNullOrEmpty(input) || char.IsLower(input[0]))
             {
-                Directory.Delete(modulePath, true);
-            }
-            string command = $"dotnet new {template} -lang \"C#\" -n {moduleName} -f \"net8.0\" -o \"{modulePath}\"";
-            Process.Start("cmd.exe", $"/c {command}");
+                return input;
+            }                
 
-            Directory.CreateDirectory($"{modulePath}\\Database");
-            Directory.CreateDirectory($"{modulePath}\\Domain");
-            Directory.CreateDirectory($"{modulePath}\\Domain\\Entities");
-
+            return char.ToLower(input[0]) + input.Substring(1);
         }
+        /*
+                private void CreateSolution(string moduleName, string modulePath)
+                {
+                    string cdCommand = $"cd {_moduleRootPath}";
+                    string cdAgainCommand = $"cd {modulePath}";
+                    string command = $"dotnet new sln -n {moduleName} -o {moduleName}";
+                    string addLibProjectCommand = $"dotnet sln add {modulePath}\\{moduleName}\\{moduleName}.csproj";
+                    string addApiProjectCommand = $"dotnet sln add {modulePath}\\{moduleName}.API\\{moduleName}.API.csproj";
+                    Process.Start("cmd.exe", $"/c {cdCommand}&{command}&{cdAgainCommand}&{addLibProjectCommand}&{addApiProjectCommand}");
+                }
 
-        private void GenerateDbContext(CustomModuleModel module, string moduleName, string modulePath)
-        {
-            StringBuilder contextContent = new StringBuilder();
-            contextContent.AppendLine("using System;");
-            contextContent.AppendLine("using System.Collections.Generic;");
-            contextContent.AppendLine("using Microsoft.EntityFrameworkCore;");
-            contextContent.AppendLine("");
-            contextContent.AppendLine($"namespace {moduleName}.Domain.Entities");
-            contextContent.AppendLine("{");
-            contextContent.AppendLine($"\tpublic class {moduleName}Context : DbContext");
-            contextContent.AppendLine("\t{");
-            foreach (CustomEntityModel entity in module.Entities)
-            {
-                contextContent.AppendLine($"\t\tpublic DbSet<{entity.Name}> {entity.Name}s {{ get; set; }}");
-            }
-            contextContent.AppendLine("\t}");
-            contextContent.AppendLine("}");
+                private void GenerateProject(string moduleName, string modulePath, string template)
+                {
+                    if (Directory.Exists(modulePath))
+                    {
+                        Directory.Delete(modulePath, true);
+                    }
+                    string command = $"dotnet new {template} -lang \"C#\" -n {moduleName} -f \"net8.0\" -o \"{modulePath}\"";
+                    Process.Start("cmd.exe", $"/c {command}");
 
-            string contextPath = $"{modulePath}\\Database\\{moduleName}Context.cs";
-            File.WriteAllText(contextPath, contextContent.ToString());
-        }
+                    Directory.CreateDirectory($"{modulePath}\\Database");
+                    Directory.CreateDirectory($"{modulePath}\\Domain");
+                    Directory.CreateDirectory($"{modulePath}\\Domain\\Entities");
 
-        private void GenerateEntity(
-            CustomModuleModel module,
-            CustomEntityModel entity,
-            string moduleName,
-            string modulPath)
-        {
-            string entityPath = $"{modulPath}\\Domain\\Entities\\{entity.Name}.cs";
-            string entityContent = GenerateEntityContent(module, entity, moduleName);
-            File.WriteAllText(entityPath, entityContent);
-        }
+                }
 
-        private string GenerateEntityContent(CustomModuleModel module, CustomEntityModel entity, string moduleName)
-        {
-            StringBuilder entityContent = new StringBuilder();
-            entityContent.AppendLine("using System;");
-            entityContent.AppendLine("using System.Collections.Generic;");
-            entityContent.AppendLine("");
-            /*entityContent.AppendLine("using System.Linq;");
-            entityContent.AppendLine("using System.Text;");
-            entityContent.AppendLine("using System.Threading.Tasks;");*/
-            entityContent.AppendLine();
-            entityContent.AppendLine($"namespace {moduleName}.Domain.Entities");
-            entityContent.AppendLine("{");
-            entityContent.AppendLine($"\tpublic class {entity.Name}");
-            entityContent.AppendLine("\t{");
-            foreach (CustomEntityFieldModel field in entity.Fields)
-            {
-                entityContent.AppendLine($"\t\tpublic {field.Type} {field.Name} {{ get; set; }}");
-            }
-            entityContent.AppendLine("\t}");
-            entityContent.AppendLine("}");
+                private void GenerateDbContext(CustomModuleModel module, string moduleName, string modulePath)
+                {
+                    StringBuilder contextContent = new StringBuilder();
+                    contextContent.AppendLine("using System;");
+                    contextContent.AppendLine("using System.Collections.Generic;");
+                    contextContent.AppendLine("using Microsoft.EntityFrameworkCore;");
+                    contextContent.AppendLine("");
+                    contextContent.AppendLine($"namespace {moduleName}.Domain.Entities");
+                    contextContent.AppendLine("{");
+                    contextContent.AppendLine($"\tpublic class {moduleName}Context : DbContext");
+                    contextContent.AppendLine("\t{");
+                    foreach (CustomEntityModel entity in module.Entities)
+                    {
+                        contextContent.AppendLine($"\t\tpublic DbSet<{entity.Name}> {entity.Name}s {{ get; set; }}");
+                    }
+                    contextContent.AppendLine("\t}");
+                    contextContent.AppendLine("}");
 
-            return entityContent.ToString();
-        }
+                    string contextPath = $"{modulePath}\\Database\\{moduleName}Context.cs";
+                    File.WriteAllText(contextPath, contextContent.ToString());
+                }
+
+                private void GenerateEntity(
+                    CustomModuleModel module,
+                    CustomEntityModel entity,
+                    string moduleName,
+                    string modulPath)
+                {
+                    string entityPath = $"{modulPath}\\Domain\\Entities\\{entity.Name}.cs";
+                    string entityContent = GenerateEntityContent(module, entity, moduleName);
+                    File.WriteAllText(entityPath, entityContent);
+                }
+
+                private string GenerateEntityContent(CustomModuleModel module, CustomEntityModel entity, string moduleName)
+                {
+                    StringBuilder entityContent = new StringBuilder();
+                    entityContent.AppendLine("using System;");
+                    entityContent.AppendLine("using System.Collections.Generic;");
+                    entityContent.AppendLine("");
+                    *//*entityContent.AppendLine("using System.Linq;");
+                    entityContent.AppendLine("using System.Text;");
+                    entityContent.AppendLine("using System.Threading.Tasks;");*//*
+                    entityContent.AppendLine();
+                    entityContent.AppendLine($"namespace {moduleName}.Domain.Entities");
+                    entityContent.AppendLine("{");
+                    entityContent.AppendLine($"\tpublic class {entity.Name}");
+                    entityContent.AppendLine("\t{");
+                    foreach (CustomEntityFieldModel field in entity.Fields)
+                    {
+                        entityContent.AppendLine($"\t\tpublic {field.Type} {field.Name} {{ get; set; }}");
+                    }
+                    entityContent.AppendLine("\t}");
+                    entityContent.AppendLine("}");
+
+                    return entityContent.ToString();
+                }*/
     }
 }

@@ -8,12 +8,13 @@ Aplikacja oprócz aplikacji głównej (SmartERP.ModuleEditor.ReactiveUI) stanowi
 
 Jak zacząć:
 1. W klasie SmartERP.ModuleEditor.ReactiveUI.Static.DependencyResolver należy przy wywołaniu metody BuildServiceProvider wprowadzić Connection String do własnej bazy danych
-2. Uruchomić aplikację utworzyć nowy moduł klikając w lewym górnym rogu przycisk Add
-3. Wypełnić odpowiednio pola modułu 
-4. Dodać encje klikając Add Entity, wypełniając pola encji, dodając pola przez Add Field a następnie zapisując klikając przycisk Save w prawym dolnym rogu okna
-5. Krok można powtarzać aż do uzyskania satysfakcjonującej ilości encji
-6. Kliknąć przycisk Save w prawym górnym rogu okna spowoduje zapisanie encji
-7. Kliknąć przycisk Generate w lewym górnym rogu okna - spowoduje to wygenerowanie w katalogu z aplikacją (bin) w folderze Modules solucji oraz projektów wybranego modułu
+2. Przeprowadzić migrację kontekstu z projektu SmartERP.Development.Database lub uruchomić skrypt SmartERP_Database_Create.sql z katalogu SQL tego projektu
+3. Uruchomić aplikację utworzyć nowy moduł klikając w lewym górnym rogu przycisk Add
+4. Wypełnić odpowiednio pola modułu 
+5. Dodać encje klikając Add Entity, wypełniając pola encji, dodając pola przez Add Field a następnie zapisując klikając przycisk Save w prawym dolnym rogu okna
+6. Krok można powtarzać aż do uzyskania satysfakcjonującej ilości encji
+7. Kliknąć przycisk Save w prawym górnym rogu okna spowoduje zapisanie encji
+8. Kliknąć przycisk Generate w lewym górnym rogu okna - spowoduje to wygenerowanie w katalogu z aplikacją (bin) w folderze Modules solucji oraz projektów wybranego modułu
 
 Uwagi:
 - trzeba uważnie wypełniać pola formularza, ponieważ nie mają one żadnej walidacji
